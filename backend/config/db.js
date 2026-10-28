@@ -1,7 +1,9 @@
 const mysql = require("mysql2/promise");
 const path = require("path");
-require("dotenv").config({
-  path: path.join(__dirname, "../../.env"),
+const dotenv = require("dotenv");
+
+dotenv.config({
+  path: path.join(__dirname, "../.env"),
 });
 
 const db = mysql.createPool({
@@ -14,8 +16,14 @@ const db = mysql.createPool({
 });
 
 async function connectDB() {
-  await db.query("SELECT 1");
-  console.log("MySQL connected successfully!");
+  const connection = await db.getConnection();
+
+  try {
+    await connection.ping();
+    console.log("MySQL connected successfully!");
+  } finally {
+    connection.release();
+  }
 }
 
 module.exports = { db, connectDB };
